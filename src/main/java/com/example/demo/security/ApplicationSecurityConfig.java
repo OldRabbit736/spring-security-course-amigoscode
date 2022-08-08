@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,6 +28,10 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder passwordEncoder;
 
+    /*
+    CSRF는 켜는 게 맞다. 더 공부할 필요가 있다.
+    CSRF를 켜게 되면, logout에 POST 메서드를 사용해야 한다.
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -45,7 +49,14 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .rememberMe()   // defaults to 2 weeks
                 .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(21))
-                .key("somethingverysecured");
+                .key("somethingverysecured")
+                .and()
+                .logout()
+                .logoutUrl("/logout")
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
+                .clearAuthentication(true).invalidateHttpSession(true)
+                .deleteCookies("JSEEIONID", "remember-me")
+                .logoutSuccessUrl("/login");
     }
 
     // Bean 으로 등록된 UserDetailsService 가 없으면,
