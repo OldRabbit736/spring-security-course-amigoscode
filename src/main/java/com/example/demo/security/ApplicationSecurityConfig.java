@@ -35,12 +35,13 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/", "index", "/css/**", "/js/**").permitAll()
                 .antMatchers("/api/**").hasRole(STUDENT.name())
-                .anyRequest()
-                .authenticated()
+                .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/login").permitAll(true)
-                .defaultSuccessUrl("/courses", true);
+                .loginPage("/login").permitAll()
+                .defaultSuccessUrl("/courses", true)
+                .and()
+                .rememberMe();   // defaults to 2 weeks
     }
 
     // Bean 으로 등록된 UserDetailsService 가 없으면,
