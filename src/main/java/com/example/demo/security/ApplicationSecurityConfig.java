@@ -38,7 +38,9 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest()
                 .authenticated()
                 .and()
-                .formLogin();
+                .formLogin()
+                .loginPage("/login").permitAll(true)
+                .defaultSuccessUrl("/courses", true);
     }
 
     // Bean 으로 등록된 UserDetailsService 가 없으면,
