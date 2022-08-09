@@ -1,6 +1,6 @@
 Spring security
 - 쉽게 security 설정을 할 수 있도록 도와준다.
-    - authentication(login, logout, cookie management)
+    - authentication(login, logout, session management)
     - authorization (access control by GrantedAuthority)
     - security (CSRF 등)
 - 기능을 사용하려면 크게 다음의 5가지 요소가 필요한 것 같다.
