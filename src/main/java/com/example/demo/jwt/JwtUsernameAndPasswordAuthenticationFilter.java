@@ -40,7 +40,8 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
                     authenticationRequest.getUsername(),
                     authenticationRequest.getPassword()
             );
-            return authenticationManager.authenticate(authentication);
+            Authentication authenticate = authenticationManager.authenticate(authentication);
+            return authenticate;
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -64,6 +65,6 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
                 .signWith(Keys.hmacShaKeyFor(key.getBytes()))
                 .compact();
 
-        response.addHeader("Authorization", "Bearer" + jwtToken);
+        response.addHeader("Authorization", "Bearer " + jwtToken);
     }
 }
