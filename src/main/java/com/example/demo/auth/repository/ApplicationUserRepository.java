@@ -1,6 +1,6 @@
 package com.example.demo.auth.repository;
 
-import com.example.demo.auth.ApplicationUser;
+import com.example.demo.auth.domain.ApplicationUser;
 
 import java.util.Optional;
 

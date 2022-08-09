@@ -1,5 +1,7 @@
-package com.example.demo.auth.repository;
+package com.example.demo.auth.config;
 
+import com.example.demo.auth.repository.ApplicationUserRepository;
+import com.example.demo.auth.repository.FakeApplicationUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

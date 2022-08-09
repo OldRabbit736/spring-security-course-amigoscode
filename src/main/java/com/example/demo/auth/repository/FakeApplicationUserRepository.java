@@ -1,16 +1,14 @@
 package com.example.demo.auth.repository;
 
-import com.example.demo.auth.ApplicationUser;
+import com.example.demo.auth.domain.ApplicationUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
 import static com.example.demo.security.ApplicationUserRole.*;
 
-@Repository
 @RequiredArgsConstructor
 public class FakeApplicationUserRepository implements ApplicationUserRepository {
 
