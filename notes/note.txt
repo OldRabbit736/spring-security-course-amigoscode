@@ -9,6 +9,13 @@ Spring security
     - UserDetailsService interface 구현체 (실제 User를 반환하는 서비스)
     - PasswordEncoder interface 구현체
     - GrantedAuthority 로 치환될 수 있는 permission, role 구성
+- 그런데 실제로 클라이언트에서 제출한 아이디와 패스워드가 맞는지 누가 검사하는 것일까?
+    - 누군가가 클라이언트 request 로부터 username, password 를 추출하고,
+    - UserDetailService 로부터 해당 username 과 일치하는 UserDetail 을 얻은 다음,
+    - password 가 일치하는지 검증 (물론 PasswordEncoder 를 이용해서) 해야 하며,
+    - 일치한다면 세션까지 만들 것인데, 누가 하는 건지?? 자동으로 코드가 생성되는 걸까?
+    - 그런데 JwtUsernameAndPasswordAuthenticationFilter 를 이용해 Jwt 를 이용한 인증을 구현하고 있는데
+      여기서는 위의 이 과정들을 수동으로 구현하고 있는 듯 하다... 왜 둘의 경우가 다른 것일까?
 
 
 WebSecurityConfigurerAdapter.configure(HttpSecurity http)
