@@ -1,6 +1,7 @@
 package com.example.demo.security;
 
 import com.example.demo.auth.service.ApplicationUserService;
+import com.example.demo.jwt.JwtUsernameAndPasswordAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -9,6 +10,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -26,12 +28,36 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     private final PasswordEncoder passwordEncoder;
     private final ApplicationUserService applicationUserService;
 
-    /*
-    CSRF는 켜는 게 맞다. 더 공부할 필요가 있다.
-    CSRF를 켜게 되면, logout에 POST 메서드를 사용해야 한다.
-     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        //setSecurity(http);
+        setSecurityForJwtAuthentication(http);
+    }
+
+    /*
+    Jwt token 은 stateless 하기 때문에, 아래 설정에서 session 을 생성하지 않는 전략을 취한다.
+     */
+    private void setSecurityForJwtAuthentication(HttpSecurity http) throws Exception {
+        http
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager()))
+                .authorizeRequests()
+                .antMatchers("/", "index", "/css/**", "/js/**").permitAll()
+                .antMatchers("/api/**").hasRole(STUDENT.name())
+                .anyRequest().authenticated();
+    }
+
+    /*
+    강좌에서 jwt token 방식 이전에 쓰인 세팅
+     */
+    private void setSecurity(HttpSecurity http) throws Exception {
+        /*
+        CSRF는 켜는 게 맞다. 더 공부할 필요가 있다.
+        CSRF를 켜게 되면, logout에 POST 메서드를 사용해야 한다.
+        */
+
         http
                 //.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 //.and()
