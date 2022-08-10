@@ -1,6 +1,8 @@
 package com.example.demo.security;
 
 import com.example.demo.auth.service.ApplicationUserService;
+import com.example.demo.jwt.JwtConfig;
+import com.example.demo.jwt.JwtTokenVerifier;
 import com.example.demo.jwt.JwtUsernameAndPasswordAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import javax.crypto.SecretKey;
 import java.util.concurrent.TimeUnit;
 
 import static com.example.demo.security.ApplicationUserRole.STUDENT;
@@ -27,6 +30,8 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder passwordEncoder;
     private final ApplicationUserService applicationUserService;
+    private final SecretKey secretKey;
+    private final JwtConfig jwtConfig;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -42,7 +47,8 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager()))
+                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig, secretKey))
+                .addFilterAfter(new JwtTokenVerifier(secretKey, jwtConfig), JwtUsernameAndPasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/", "index", "/css/**", "/js/**").permitAll()
                 .antMatchers("/api/**").hasRole(STUDENT.name())

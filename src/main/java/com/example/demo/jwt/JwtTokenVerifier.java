@@ -12,6 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.crypto.SecretKey;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -24,24 +25,30 @@ import java.util.stream.Collectors;
 
 public class JwtTokenVerifier extends OncePerRequestFilter {
 
+    private final SecretKey secretKey;
+    private final JwtConfig jwtConfig;
+
+    public JwtTokenVerifier(SecretKey secretKey, JwtConfig jwtConfig) {
+        this.secretKey = secretKey;
+        this.jwtConfig = jwtConfig;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String authorizationHeader = request.getHeader("Authorization");
+        String authorizationHeader = request.getHeader(jwtConfig.getAuthorizationHeader());
 
-        if (Strings.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith("Bearer ")) {
+        if (Strings.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith(jwtConfig.getTokenPrefix())) {
             filterChain.doFilter(request, response);    // 이 라인이 필요한가??
             return;
         }
 
-        String token = authorizationHeader.replace("Bearer ", "");
+        String token = authorizationHeader.replace(jwtConfig.getTokenPrefix(), "");
 
         try {
-            String secretKey = "some_secure_key_that_must_not_be_forgotten";
-
             Jws<Claims> claimsJws = Jwts.parserBuilder()
-                    .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
+                    .setSigningKey(secretKey)
                     .build()
                     .parseClaimsJws(token);
 
@@ -66,5 +73,8 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
         } catch (JwtException e) {
             throw new IllegalStateException(String.format("Token %s cannot be trusted", token));
         }
+
+        filterChain.doFilter(request, response);
+
     }
 }
